@@ -317,7 +317,7 @@ thread_exit (void) {
     /* Just set our status to dying and schedule another process.
        We will be destroyed during the call to schedule_tail(). */
     intr_disable ();
-    list_remove(&thread_current()->allelem); // 전부 사용한 thread는 all_list에서 제거
+    // list_remove(&thread_current()->allelem); // 전부 사용한 thread는 all_list에서 제거
     do_schedule (THREAD_DYING);
     NOT_REACHED ();
 }
