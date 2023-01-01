@@ -126,7 +126,6 @@ syscall_handler (struct intr_frame *f UNUSED) {
 			exit(f->R.rdi);
 			break;
 		case SYS_FORK:
-			memcpy(&thread_current()->parent_if, f, sizeof(struct intr_frame));
 			f->R.rax = fork(f->R.rdi, f);
 			break;
 		case SYS_EXEC:
@@ -265,7 +264,6 @@ int open (const char *file) {
 	성공 시 fd를 생성하고 반환, 실패 시 -1 반환
 	File : 파일의 이름 및 경로 정보 */
 	check_address(file);
-	lock_acquire(&filesys_lock);
 	struct file *fileobj = filesys_open(file);	// return file_open()
 
 	if (fileobj == NULL)
@@ -276,7 +274,6 @@ int open (const char *file) {
 	if (fd == -1)
 		file_close(fileobj);
 
-	lock_release(&filesys_lock);
 	return fd;
 }
 

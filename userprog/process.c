@@ -258,7 +258,7 @@ process_exec (void *f_name) {
 	process_cleanup ();
 
 	/* argument parsing */
-	char *argv[30];
+	char *argv[128];
 	int argc = 0;
 
 	char *token, *save_ptr;
