@@ -215,6 +215,33 @@ outputs:
 'to'
 'tokenize.'
 */
+/* 	문자열을 DELIMITERS로 구분된 토큰으로 나눕니다.
+	이 함수가 처음 호출될 때 S는 토큰화할 문자열이어야 하며 후속 호출에서는 널 포인터여야 합니다.
+    SAVE_PTR은 토크나이저의 위치를 추적하는 데 사용되는 'char *' 변수의 주소입니다.
+	매번 반환 값은 문자열의 다음 토큰이거나 토큰이 남아 있지 않으면 null 포인터입니다.
+
+    이 함수는 인접한 여러 구분 기호를 단일 구분 기호로 처리합니다.
+	반환된 토큰은 길이가 0이 되지 않습니다.
+    DELIMITERS는 단일 문자열 내에서 한 호출에서 다음 호출로 변경될 수 있습니다.
+
+    strtok_r()은 구분 기호를 null 바이트로 변경하여 문자열 S를 수정합니다.
+	따라서 S는 수정 가능한 문자열이어야 합니다. 특히 문자열 리터럴은 이전 버전과의 호환성을 위해 'const'가 아니지만 C에서 수정할 수 *없습니다*.
+
+사용 예:
+
+    char s[] = "String to tokenize.";
+	char *token, *save_ptr;
+	for (token = strtok_r (s, " ", &save_ptr); token != NULL;
+		token = strtok_r (NULL, " ", &save_ptr))
+	printf ("'%s'\n", token);
+
+
+출력:
+
+'String'
+'to'
+'tokenize.'
+*/
 char *
 strtok_r (char *s, const char *delimiters, char **save_ptr) {
 	char *token;
@@ -233,6 +260,8 @@ strtok_r (char *s, const char *delimiters, char **save_ptr) {
 		/* strchr() will always return nonnull if we're searching
 		   for a null byte, because every string contains a null
 		   byte (at the end). */
+		/* 	strchr()는 모든 문자열이 (끝에) null 바이트를 포함하기 때문에 
+			null 바이트를 검색하는 경우 항상 null이 아닌 값을 반환합니다. */
 		if (*s == '\0') {
 			*save_ptr = s;
 			return NULL;
