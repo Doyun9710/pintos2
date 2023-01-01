@@ -94,14 +94,14 @@ process_fork (const char *name, struct intr_frame *if_ UNUSED) {
 
 	/* __do_fork를 실행 */
 	tid_t tid = thread_create(name, PRI_DEFAULT, __do_fork, cur);
-	if (tid == -1)
-		return -1;
+	if (tid == TID_ERROR)
+		return TID_ERROR;
 
 	struct thread *child = get_child_with_pid(tid);
 
 	sema_down(&child->fork_sema);
 
-	if (child->exit_status == -1)
+	if (child->exit_status == TID_ERROR)
 		return TID_ERROR;
 
 	return tid;
@@ -258,7 +258,7 @@ process_exec (void *f_name) {
 	process_cleanup ();
 
 	/* argument parsing */
-	char *argv[30];
+	char *argv[128];
 	int argc = 0;
 
 	char *token, *save_ptr;
@@ -345,7 +345,6 @@ process_wait (tid_t child_tid UNUSED) {
 	// for(int i = 0 ; i<10000000; i++);
 	
 	// return -1;
-
 	struct thread *child = get_child_with_pid(child_tid);
 
 	if(child == NULL)

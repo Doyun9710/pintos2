@@ -25,7 +25,7 @@ void check_address(void *addr);
 
 /* System_Call_2.2 halt, exit, create, remove */
 /*====================Process====================*/
-typedef int pid_t;	// syscall.h 에 정의되어 있다. 근데 왜 인식 X?
+// typedef int pid_t;	// syscall.h 에 정의되어 있다. 근데 왜 인식 X?
 void halt(void);
 void exit(int status);
 /*====================Process====================*/
@@ -39,9 +39,9 @@ bool remove (const char *file);
 
 /* System_Call_2.3 Hierarchical Process Structure */
 /*====================Process====================*/
-pid_t fork(const char *thread_name, struct intr_frame *f);
+tid_t fork(const char *thread_name, struct intr_frame *f);
 int exec (char *file_name);
-// int wait (pid_t pid);
+int wait (tid_t pid);
 /*====================Process====================*/
 
 /*=====================File======================*/
@@ -126,7 +126,7 @@ syscall_handler (struct intr_frame *f UNUSED) {
 			exit(f->R.rdi);
 			break;
 		case SYS_FORK:
-			memcpy(&thread_current()->parent_if, f, sizeof(struct intr_frame));
+			// memcpy(&thread_current()->parent_if, f, sizeof(struct intr_frame));
 			f->R.rax = fork(f->R.rdi, f);
 			break;
 		case SYS_EXEC:
@@ -134,7 +134,7 @@ syscall_handler (struct intr_frame *f UNUSED) {
 				exit(-1);
 			break;
 		case SYS_WAIT:
-			f->R.rax = process_wait(f->R.rdi);
+			f->R.rax = wait(f->R.rdi);
 			break;
 		case SYS_CREATE:
 			f->R.rax = create(f->R.rdi, f->R.rsi);
@@ -227,7 +227,7 @@ bool remove (const char *file) {
 
 /* System_Call_2.3 Hierarchical Process Structure */
 
-pid_t fork(const char *thread_name, struct intr_frame *f) {
+tid_t fork(const char *thread_name, struct intr_frame *f) {
 	return process_fork(thread_name, f);
 }
 
@@ -248,9 +248,9 @@ int exec(char *file_name) {
 	return 0;
 }
 
-// int wait (pid_t pid) {
-// 	process_wait(pid);
-// }
+int wait (tid_t pid) {
+	return process_wait(pid);
+}
 
 
 
@@ -265,7 +265,6 @@ int open (const char *file) {
 	성공 시 fd를 생성하고 반환, 실패 시 -1 반환
 	File : 파일의 이름 및 경로 정보 */
 	check_address(file);
-	lock_acquire(&filesys_lock);
 	struct file *fileobj = filesys_open(file);	// return file_open()
 
 	if (fileobj == NULL)
@@ -276,7 +275,6 @@ int open (const char *file) {
 	if (fd == -1)
 		file_close(fileobj);
 
-	lock_release(&filesys_lock);
 	return fd;
 }
 

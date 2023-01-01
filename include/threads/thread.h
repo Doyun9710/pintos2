@@ -126,7 +126,7 @@ struct thread {
 
     /* 자식 프로세스 순회용 리스트 */
     struct list child_list;
-    struct list_elem child_elem; 
+    struct list_elem child_elem;
 
     /* wait_sema 를 이용하여 자식 프로세스가 종료할때까지 대기함. 
     종료 상태를 저장 */
